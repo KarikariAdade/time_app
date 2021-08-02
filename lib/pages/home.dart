@@ -18,15 +18,18 @@ class _HomeState extends State<Home> {
 
     //Modal route to get content of route data
 
-    data = ModalRoute.of(context).settings.arguments;
+    data = data.isNotEmpty ? data : ModalRoute.of(context).settings.arguments;
 
     // Set background
 
     String bgImage = data['isDaytime'] ? 'day.png' : 'night.png';
 
-    var textColor = data['isDaytime'] ? Colors.black : Colors.white;
+    Color textColor = data['isDaytime'] ? Colors.black : Colors.white;
+
+    Color bgColor = data['isDaytime'] ? Colors.blue : Colors.indigo[900];
 
     return Scaffold(
+      backgroundColor: bgColor,
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
@@ -40,8 +43,16 @@ class _HomeState extends State<Home> {
             child: Column(
               children: <Widget>[
                 FlatButton.icon(
-                    onPressed: (){
-                      Navigator.pushNamed(context, '/location');
+                    onPressed: () async {
+                      dynamic result = await Navigator.pushNamed(context, '/location');
+                      setState(() {
+                        data = {
+                          'location': result['location'],
+                          'time': result['time'],
+                          'flag': result['flag'],
+                          'isDaytime': result['isDaytime'],
+                        };
+                      });
                     },
                     icon: Icon(Icons.edit_location, color: textColor),
                     label: Text('Edit Location', style: TextStyle(color: textColor))
